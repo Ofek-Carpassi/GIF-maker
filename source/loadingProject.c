@@ -4,25 +4,31 @@
 #include "../headers/loadingProject.h"
 #include "../headers/video.h"
 #include "../headers/functions.h"
+#include "../headers/constants.h"
 
 int loadingProjectMain()
 {
-    // Saving and creating a new project isn't implemented yet - loading project and creating project are the same
-
     // Print the welcome message
-    char path[100];
+    char path[MAX_STRING_LENGTH];
+    Video* video = NULL;
+    int option = 0;
     printf("Please enter the path to the project you would like to load\n");
     scanf("%s", path);
 
     // Create a new video
-    Video* video = loadProject(path);
+    video = loadProject(path);
+
+    if (video == NULL)
+    {
+        return 1;
+    }
 
     // Handle the user's choice
-    int option = -1;
-    while (option != 0)
+    option = NOT_CHOSEN;
+    while (option != EXIT)
     {
         option = getOption();
-        if(option == 8)
+        if(option == SAVE_PROJECT)
         {
             saveProject(video, path);
             continue;
@@ -35,6 +41,13 @@ int loadingProjectMain()
 Video *loadProject(char* path)
 {
     // Load the project from the given path
+    Video* video = NULL;
+    uint32_t frameCount = 0, duration = 0;
+    size_t pathLength = 0, nameLength = 0;
+    char *name = NULL;
+    BinaryFrame* binaryFrame = NULL;
+    Frame* frame = NULL;
+    int frameIndex = 0;
     FILE *file = fopen(path, "rb");
     if (file == NULL)
     {
@@ -43,42 +56,38 @@ Video *loadProject(char* path)
     }
 
     // Read the number of frames
-    uint32_t frameCount;
-    fread(&frameCount, sizeof(uint32_t), 1, file);
+    fread(&frameCount, sizeof(uint32_t), ONE, file);
 
     // Create a new video
-    Video* video = (Video*)malloc(sizeof(Video));
+    video = (Video*)malloc(sizeof(Video));
     video->head = NULL;
     video->tail = NULL;
     video->frameCount = (unsigned int)frameCount;
 
-    for (int i = 0; i < frameCount; i++)
+    for (frameIndex = 0; frameIndex < frameCount; frameIndex++)
     {
         // Read the duration
-        uint32_t duration;
-        fread(&duration, sizeof(uint32_t), 1, file);
+        fread(&duration, sizeof(uint32_t), ONE, file);
         // Read the size of the frame data
-        size_t pathLength;
-        fread(&pathLength, sizeof(size_t), 1, file);
+        fread(&pathLength, sizeof(size_t), ONE, file);
         // Read the path
-        char* path = (char*)malloc(pathLength + 1); // +1 for null terminator
+        path = (char*)malloc(pathLength + NULL_TERMINATOR_LENGTH); // +1 for null terminator
         fread(path, sizeof(char), pathLength, file);
         path[pathLength] = '\0'; // Null terminate the string
         // Read the size of the frame name
-        size_t nameLength;
-        fread(&nameLength, sizeof(size_t), 1, file);
+        fread(&nameLength, sizeof(size_t), ONE, file);
         // Read the frame name
-        char* name = (char*)malloc(nameLength + 1); // +1 for null terminator
+        name = (char*)malloc(nameLength + NULL_TERMINATOR_LENGTH); // +1 for null terminator
         fread(name, sizeof(char), nameLength, file);
-        name[nameLength] = '\0'; // Null terminate the string
+        name[nameLength] = NULL_TERMINATOR; // Null terminate the string
         // Create a new binary frame
-        BinaryFrame* binaryFrame = (BinaryFrame*)malloc(sizeof(BinaryFrame));
+        binaryFrame = (BinaryFrame*)malloc(sizeof(BinaryFrame));
         binaryFrame->duration = duration;
         binaryFrame->pathLength = pathLength;
         binaryFrame->path = path; // Directly assign the allocated path
         binaryFrame->nameLength = nameLength;
         binaryFrame->name = name; // Directly assign the allocated name
-        Frame *frame = convertBinaryFrameToRegularFrame(binaryFrame);
+        frame = convertBinaryFrameToRegularFrame(binaryFrame);
         // Add the frame to the video
         addFrameToVideo(video, frame);
         // Free the binary frame structure after conversion

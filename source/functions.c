@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../headers/video.h"
 #include "../headers/functions.h"
+#include "../headers/constants.h"
 
 void printMenu()
 {
@@ -32,28 +33,28 @@ void handleOption(int option, Video *GIF)
     // Handle the user's choice
     switch (option)
     {
-        case 0:
+        case EXIT:
             printf("\nBye!\n");
             break;
-        case 1:
+        case ADD_FRAME:
             addFrame(GIF);
             break;
-        case 2:
+        case REMOVE_FRAME:
             removeFrame(GIF);
             break;
-        case 3:
+        case CHANGE_FRAME_INDEX:
             changeFrameIndex(GIF);
             break;
-        case 4:
+        case CHANGE_FRAME_DURATION:
             changeFrameDuration(GIF);
             break;
-        case 5:
+        case CHANGE_ALL_FRAME_DURATIONS:
             changeAllFrameDurations(GIF);
             break;
-        case 6:
+        case LIST_FRAMES:
             listFrames(GIF);
             break;
-        case 7:
+        case SAVE_PROJECT:
             playVideo(GIF);
             break;
         default:

@@ -4,6 +4,7 @@
 #include <time.h>
 #include <windows.h> // Include for Sleep
 #include "../headers/video.h"
+#include "../headers/constants.h"
 
 void playVideo(Video* video)
 {
@@ -11,7 +12,7 @@ void playVideo(Video* video)
     FrameNode* current = video->head;
 
     // Print the video GIF_REPEAT times
-    for (int i = 0; i < GIF_REPEAT; i++)
+    for (int i = ZERO; i < GIF_REPEAT; i++)
     {
         // While the current frame is not NULL - we haven't reached the end of the list
         while (current != NULL)
@@ -23,7 +24,7 @@ void playVideo(Video* video)
             printf("\n");
 
             // Wait for the duration of the frame * 1000 (to convert to seconds)
-            Sleep(current->frame->duration * 1000);
+            Sleep(current->frame->duration * MILISECONDS_TO_SECONDS);
 
             // Move to the next frame
             current = current->next;
@@ -38,7 +39,7 @@ void addFrame(Video* video)
     printf("*** Creating new frame ***\n");
 
     // Get the path of the frame
-    char path[100];
+    char path[MAX_STRING_LENGTH];
     printf("Please insert frame path:\n");
     scanf("%s", path);
 
@@ -63,14 +64,14 @@ void addFrame(Video* video)
     scanf("%d", &duration);
 
     /* Make sure the duration is valid */
-    if (duration <= 0)
+    if (duration <= ZERO)
     {
         printf("Invalid duration! Frame will not be added\n\n");
         return;
     }
 
     // Get the name of the frame
-    char name[100];
+    char name[MAX_STRING_LENGTH];
     printf("Please choose a name for that frame:\n");
     scanf("%s", name);
 
@@ -83,8 +84,8 @@ void addFrame(Video* video)
 
     // Allocate memory for the frame and the frame path and name
     Frame* frame = (Frame*)malloc(sizeof(Frame));
-    frame->path = (char*)malloc(strlen(path) + 1);
-    frame->name = (char*)malloc(strlen(name) + 1);
+    frame->path = (char*)malloc(strlen(path) + NULL_TERMINATOR_LENGTH);
+    frame->name = (char*)malloc(strlen(name) + NULL_TERMINATOR_LENGTH);
 
     // Copy the path, duration and name to the frame
     strcpy(frame->path, path);
@@ -122,7 +123,7 @@ FrameNode* findFrame(Video* video, char* name)
     while (current != NULL)
     {
         // If the name of the current frame is the same as the name we're looking for, return the frame node
-        if (strcmp(current->frame->name, name) == 0)
+        if (strcmp(current->frame->name, name) == COMPARE_EQUAL)
             return current;
         // Move to the next frame
         current = current->next;
@@ -133,7 +134,7 @@ FrameNode* findFrame(Video* video, char* name)
 void removeFrame(Video* video)
 {
     // Get the name of the frame to remove
-    char name[100];
+    char name[MAX_STRING_LENGTH];
     printf("Enter the name of the frame you wish to erase\n");
     scanf("%s", name);
 
@@ -143,7 +144,7 @@ void removeFrame(Video* video)
     while (current != NULL)
     {
         // If the name of the current frame is the same as the name we're looking for
-        if (strcmp(current->frame->name, name) == 0)
+        if (strcmp(current->frame->name, name) == COMPARE_EQUAL)
         {
             // If the frame is the head of the list
             if (previous == NULL)
@@ -193,7 +194,7 @@ void listFrames(Video* video)
 void changeFrameIndex(Video* video)
 {
     // Get the name of the frame to change the index of
-    char name[100];
+    char name[MAX_STRING_LENGTH];
     printf("Enter the name of the frame\n");
     scanf("%s", name);
 
@@ -203,7 +204,7 @@ void changeFrameIndex(Video* video)
     scanf("%d", &newIndex);
 
     // Make sure the index is valid
-    while (newIndex < 1 || newIndex > video->frameCount)
+    while (newIndex < ONE || newIndex > video->frameCount)
     {
         printf("Invalid index! Please enter a number between 1 and %d\n", video->frameCount);
         scanf("%d", &newIndex);
@@ -216,7 +217,7 @@ void changeFrameIndex(Video* video)
     while (current != NULL)
     {
         // If the name of the current frame is the same as the name we're looking for
-        if (strcmp(current->frame->name, name) == 0)
+        if (strcmp(current->frame->name, name) == COMPARE_EQUAL)
         {
             // If the frame is the head of the list
             if (previous == NULL)
@@ -231,11 +232,11 @@ void changeFrameIndex(Video* video)
             FrameNode* temp = video->head;
 
             // Find the frame before the new index
-            for (int i = 1; i < newIndex - 1; i++)
+            for (int i = ONE; i < newIndex - ONE; i++)
                 temp = temp->next;
 
             // If the new index is 1, set the current frame as the head of the list
-            if (newIndex == 1)
+            if (newIndex == ONE)
             {
                 current->next = video->head;
                 video->head = current;
@@ -261,7 +262,7 @@ void changeFrameIndex(Video* video)
 void changeFrameDuration(Video* video)
 {
     // Get the name of the frame to change the duration of
-    char name[100];
+    char name[MAX_STRING_LENGTH];
     printf("Enter the name of the frame\n");
     scanf("%s", name);
 
@@ -271,7 +272,7 @@ void changeFrameDuration(Video* video)
     scanf("%d", &newDuration);
 
     // Make sure the duration is valid
-    while (newDuration <= 0)
+    while (newDuration <= ZERO)
     {
         printf("Invalid duration! Please enter a positive number\n");
         scanf("%d", &newDuration);
@@ -282,7 +283,7 @@ void changeFrameDuration(Video* video)
     while (current != NULL)
     {
         // If the name of the current frame is the same as the name we're looking for
-        if (strcmp(current->frame->name, name) == 0)
+        if (strcmp(current->frame->name, name) == ZERO)
         {
             // Change the duration of the frame
             current->frame->duration = newDuration;
@@ -304,7 +305,7 @@ void changeAllFrameDurations(Video* video)
     scanf("%d", &newDuration);
     
     // Make sure the duration is valid
-    while (newDuration <= 0)
+    while (newDuration <= ZERO)
     {
         printf("Invalid duration! Please enter a positive number\n");
         scanf("%d", &newDuration);
@@ -333,7 +334,7 @@ void saveProject(Video* video, char* path) // Corrected typo in comment
     }
 
     // Write the header of the file
-    fwrite(&video->frameCount, sizeof(video->frameCount), 1, file);
+    fwrite(&video->frameCount, sizeof(video->frameCount), ONE, file);
 
     // Iterate over the frames in the video and write their details to the file
     FrameNode* current = video->head;
@@ -342,19 +343,19 @@ void saveProject(Video* video, char* path) // Corrected typo in comment
         BinaryFrame binaryFrame = convertRegularFrameToBinaryFrame(current->frame); // Corrected function name typo
 
         // Write duration directly as binary
-        fwrite(&binaryFrame.duration, sizeof(binaryFrame.duration), 1, file);
+        fwrite(&binaryFrame.duration, sizeof(binaryFrame.duration), ONE, file);
 
         // Write pathLength directly as binary
-        fwrite(&binaryFrame.pathLength, sizeof(binaryFrame.pathLength), 1, file);
+        fwrite(&binaryFrame.pathLength, sizeof(binaryFrame.pathLength), ONE, file);
 
         // Write path
-        fwrite(binaryFrame.path, binaryFrame.pathLength, 1, file);
+        fwrite(binaryFrame.path, binaryFrame.pathLength, ONE, file);
 
         // Write nameLength directly as binary
-        fwrite(&binaryFrame.nameLength, sizeof(binaryFrame.nameLength), 1, file);
+        fwrite(&binaryFrame.nameLength, sizeof(binaryFrame.nameLength), ONE, file);
 
         // Write name
-        fwrite(binaryFrame.name, binaryFrame.nameLength, 1, file);
+        fwrite(binaryFrame.name, binaryFrame.nameLength, ONE, file);
 
         // Free allocated memory
         free(binaryFrame.path);
@@ -371,12 +372,12 @@ BinaryFrame convertRegularFrameToBinaryFrame(Frame* frame)
 {
     BinaryFrame binaryFrame;
     binaryFrame.duration = frame->duration;
-    binaryFrame.pathLength = strlen(frame->path) + 1; // +1 for null terminator
+    binaryFrame.pathLength = strlen(frame->path) + ONE; // +1 for null terminator
     binaryFrame.path = (char*)malloc(binaryFrame.pathLength);
     if (binaryFrame.path != NULL) {
         strcpy(binaryFrame.path, frame->path);
     }
-    binaryFrame.nameLength = strlen(frame->name) + 1; // +1 for null terminator
+    binaryFrame.nameLength = strlen(frame->name) + ONE; // +1 for null terminator
     binaryFrame.name = (char*)malloc(binaryFrame.nameLength);
     if (binaryFrame.name != NULL) {
         strcpy(binaryFrame.name, frame->name);

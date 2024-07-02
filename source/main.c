@@ -4,10 +4,7 @@
 #include <string.h>
 #include "../headers/loadingProject.h"
 #include "../headers/creatingProject.h"
-
-// Flags for the base menu
-#define CREATE_PROJECT 0
-#define LOAD_PROJECT 1
+#include "../headers/constants.h"
 
 // Function prototypes
 int baseMenu();
